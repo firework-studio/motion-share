@@ -1,6 +1,6 @@
 # 状态栏变形动画
 
-一个约 8.7 秒的横屏动画（1920×1080）：黑圆鼓起、绕一圈缩成小点，炸开成手机状态栏（信号、Wi‑Fi、电池）；电池压成竖线、甩一圈弯成圆环，信号格变成小点追进缺口，拼成「连接中」图标；随后图标还原成状态栏，镜头轻推后拉开，原来状态栏一直在手机右上角。
+一个约 8.7 秒的横屏动画（1920×1080）：黑圆鼓起、绕一圈缩成小点，炸开成手机状态栏（信号、Wi‑Fi、电池）；电池压成竖线、甩一圈弯成圆环，信号格变成小点追进缺口，拼成「连接中」图标；随后图标还原成状态栏，镜头轻推后拉开，原来状态栏一直在手机右上角；最后屏幕中央亮起 Firework 工作室的 logo。
 
 用 [HyperFrames](https://hyperframes.heygen.com)（HTML 做视频）制作，图形全部是代码绘制的 SVG。
 
@@ -23,6 +23,7 @@ npx hyperframes render --output out.mp4    # 导出视频
 | `compositions/replica.html` | 动画本身：所有图形的绘制与镜头 |
 | `assets/data/replica.js` | 前 4.3 秒每个图形的逐帧轨迹（30 fps 采样，播放时平滑插值到 60 fps） |
 | `assets/sfx/` | 三个音效：开场敲击、图标弹出、小球落位 |
+| `assets/brand/` | Firework 工作室 logo |
 
 ## 常改的地方
 
@@ -36,6 +37,7 @@ npx hyperframes render --output out.mp4    # 导出视频
 | 镜头节奏 | `LEAN`（轻推）、`REVEAL`（拉开）、`SETTLE`（缓推）三段的起止秒数 |
 | 手机落定后的大小与位置 | `C_END`（缩放）、`TOP_END`（手机上沿离画面顶部的距离） |
 | 屏幕上的时间 | `phone.clock.textContent`（`9:41`） |
+| 结尾的 logo 和名字 | 换掉 `assets/brand/firework-mark.svg`，改 `sign.name.textContent`；位置和大小在 `SIGN` |
 | 音效 | 替换 `assets/sfx/` 里的文件，或在 `index.html` 里改各个 `<audio>` 的 `data-start` 和 `data-volume` |
 
 ## 几个做法

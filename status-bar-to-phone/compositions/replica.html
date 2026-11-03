@@ -101,6 +101,17 @@
           "font-family": "Inter, sans-serif", "font-size": 34, "font-weight": 600 }, phoneG),
       };
       phone.clock.textContent = "9:41";
+      // the studio's mark on the screen once the phone is at rest, like an app starting up: placed in phone units so
+      // it rides the last slow push-in with everything else. SIGN gives its place and size as seen at rest (panel units).
+      const SIGN = { x: X0, y: 292, mark: 112, text: 30, gap: 20 };
+      const atRest = (dx, dy) => ({ x: X0 + (dx - X0) / C_END, y: Y0 + (dy - Y0 - DY_END) / C_END });
+      const markAt = atRest(SIGN.x, SIGN.y), markSize = SIGN.mark / C_END;
+      const sign = {
+        mark: mk("image", { href: "assets/brand/firework-mark.svg", x: markAt.x - markSize / 2, y: markAt.y - markSize / 2, width: markSize, height: markSize }, phoneG),
+        name: mk("text", { x: markAt.x, y: markAt.y + (SIGN.mark / 2 + SIGN.gap + SIGN.text * 0.8) / C_END, "text-anchor": "middle", stroke: "none",
+          "font-family": "Inter, 'Noto Sans JP', sans-serif", "font-size": SIGN.text / C_END, "font-weight": 600, "letter-spacing": 0.2 }, phoneG),
+      };
+      sign.name.textContent = "Firework 工作室";
       // where the status bar lands: right of the island, centred on its line (phone coordinates, camera scale 1)
       const SLOT = { x0: X0 + PH.island.w / 2 + 22, x1: X0 + PH.w / 2 - PH.stroke / 2 - 34, y: top + PH.island.top + PH.island.h / 2 };
       const el = {
@@ -246,6 +257,13 @@
         phone.island.setAttribute("y", top + PH.island.top + (ih - dh) / 2); phone.island.setAttribute("height", dh);
         phone.island.setAttribute("rx", dh / 2);
         phone.clock.style.opacity = prog(t, [REVEAL[1] - 0.35, REVEAL[1] + 0.1]);
+        // the mark comes up a beat after the camera settles, the name just behind it: a short rise and fade, nothing more
+        const mu = sineInOut(prog(t, [REVEAL[1] + 0.15, REVEAL[1] + 0.75])), nu = sineInOut(prog(t, [REVEAL[1] + 0.3, REVEAL[1] + 0.9]));
+        for (const [e, u] of [[sign.mark, mu], [sign.name, nu]]) {
+          show(e, u > 0);
+          e.style.opacity = u;
+          e.setAttribute("transform", `translate(0 ${(1 - u) * 8 / C_END})`);
+        }
       }
 
       const tl = gsap.timeline({ paused: true });
