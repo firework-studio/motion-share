@@ -15,6 +15,13 @@ npx hyperframes preview                    # 浏览器里预览，可拖动时�
 npx hyperframes render --output out.mp4    # 导出视频
 ```
 
+想要更细腻的边缘，可以按 4K 绘制再缩回 1080p：
+
+```bash
+npx hyperframes render --fps 60 --resolution landscape-4k --output out-4k.mp4
+ffmpeg -i out-4k.mp4 -vf scale=1920:1080:flags=lanczos -c:a copy out.mp4
+```
+
 ## 文件
 
 | 文件 | 内容 |
