@@ -1,0 +1,259 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #ddd7e4;
+      font-family: "Inter", sans-serif;
+    }
+    #stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <div id="root" data-composition-id="replica" data-width="1920" data-height="1080">
+    <!-- the scene is drawn in the reference's 980 × 550 panel units, filling the frame -->
+    <svg id="stage" viewBox="0 0 980 550" preserveAspectRatio="xMidYMid slice">
+      <g id="phoneG" fill="#0b0b0b" stroke="#0b0b0b"></g>
+      <g id="cam" fill="#0b0b0b" stroke="#0b0b0b" stroke-linecap="round" stroke-linejoin="round"></g>
+    </svg>
+  </div>
+  <script src="assets/data/replica.js"></script>
+  <script>
+    (function () {
+      const D = window.REPLICA, FPS = D.fps, LOOP = D.frames.length;
+      // the film: the reference's frames 11–140 (indices 10–139), until the connecting glyph has formed. Then our own
+      // ending: the glyph turns back into the status bar it came from (frame 55, BAR), and one camera move pulls back to
+      // show that the bar was sitting in the top right of a phone all along; the camera then eases in a touch and holds
+      const START = 10, HOLD = 139, BAR = 54;
+      const T_HOLD = (HOLD - START) / FPS;            // 4.3 s
+      const UNWIND = [T_HOLD, T_HOLD + 0.3];          // the ring winds itself up into its lower right end
+      const RISE = [UNWIND[1], UNWIND[1] + 0.16];     // that end stands up into the battery's upright stroke
+      const SPREAD = [RISE[1], RISE[1] + 0.35];       // and the stroke widens into the battery
+      const LEAN = [SPREAD[1] + 0.08, SPREAD[1] + 0.42];   // the camera leans in on the bar, half a breath
+      const REVEAL = [LEAN[1], LEAN[1] + 1.25];             // then pulls back to find the phone
+      const SETTLE = [REVEAL[1], REVEAL[1] + 1.6];          // a slow push-in on the status bar, to rest
+      const DURATION = SETTLE[1] + 0.3;
+      const X0 = 490, Y0 = 276.3; // the camera's fixed point: the Wi-Fi's middle arc
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const inOut3 = (x) => { x = clamp(x, 0, 1); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+      const NS = "http://www.w3.org/2000/svg";
+      const cam = document.getElementById("cam");
+      const phoneG = document.getElementById("phoneG");
+      const mk = (tag, attrs, parent = cam) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+
+      // ---------- frame sampling ----------
+      // shapes are sampled at 30 fps; between samples each number follows a Catmull-Rom curve through its neighbours
+      const cr = (p0, p1, p2, p3, u) => 0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
+      const frame = (i) => D.frames[Math.max(0, Math.min(LOOP - 1, i))];
+      // the stroke's angles are unwrapped once so a turn past ±π does not jump
+      (function unwrap() {
+        let prev = null;
+        for (const f of D.frames) {
+          const l = f && f.line;
+          if (!l || l.kind !== "arc") { prev = null; continue; }
+          let mid = (l.a0 + l.a1) / 2;
+          const half = (l.a1 - l.a0) / 2;
+          if (prev !== null) mid += Math.round((prev - mid) / (2 * Math.PI)) * 2 * Math.PI;
+          l.mid = mid; l.half = half; prev = mid;
+        }
+      })();
+      function sample(name, ft) {
+        const i = Math.floor(ft), u = ft - i;
+        const a = frame(i - 1), b = frame(i), c = frame(i + 1), d = frame(i + 2);
+        const B = b && b[name], C = c && c[name];
+        if (!B && !C) return null;
+        if (!B || !C || (B.kind || "") !== (C.kind || "")) return u < 0.5 ? B : C;
+        const A = (a && a[name] && (a[name].kind || "") === (B.kind || "")) ? a[name] : B;
+        const E = (d && d[name] && (d[name].kind || "") === (C.kind || "")) ? d[name] : C;
+        const out = { kind: B.kind };
+        for (const k in B) if (typeof B[k] === "number" && typeof C[k] === "number") out[k] = cr(A[k] ?? B[k], B[k], C[k], E[k] ?? C[k], u);
+        return out;
+      }
+
+      // ---------- drawing ----------
+      // the phone, sized at camera scale 1. Only its top is ever in view: the reveal comes to rest at scale C_END,
+      // with the phone's top edge TOP_END below the frame's top
+      const PH = { w: 400, h: 860, r: 118, stroke: 26, island: { w: 120, h: 36, top: 44 } };
+      const C_END = 1.95, TOP_END = 36, DY_END = TOP_END - Y0 + (PH.h / 2) * C_END;
+      const top = Y0 - PH.h / 2;
+      // the screen is fixed in phone units; the bezel and rim round it are set every frame to keep one width on screen
+      // (in panel units) however close the camera is, so the phone never sweeps in as a slab
+      const SCR = { x: X0 - PH.w / 2 + PH.stroke / 2, y: top + PH.stroke / 2, w: PH.w - PH.stroke, h: PH.h - PH.stroke, r: PH.r - PH.stroke / 2 };
+      // ink is the chosen look: the phone drawn with the same pen as the ring; the others are kept for comparison
+      const STYLES = {
+        ink: { bezel: 14, bezelFill: "#0b0b0b", rim: 0, rimFill: "none", shadow: false },
+        device: { bezel: 9, bezelFill: "#0b0b0b", rim: 3.5, rimFill: "#9a95a3", shadow: false },
+        porcelain: { bezel: 13, bezelFill: "#f6f4f8", rim: 1, rimFill: "#bdb6c8", shadow: true },
+      };
+      const STYLE = STYLES[window.PHONE_STYLE || "ink"];
+      const defs = mk("defs", {}, phoneG);
+      defs.innerHTML = '<filter id="phone-shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#2a2233" flood-opacity="0.18"/></filter>';
+      const phone = {
+        rim: mk("rect", { stroke: "none", fill: STYLE.rimFill }, phoneG),
+        frame: mk("rect", { stroke: "none", fill: STYLE.bezelFill, filter: STYLE.shadow ? "url(#phone-shadow)" : "" }, phoneG),
+        screen: mk("rect", { x: SCR.x, y: SCR.y, width: SCR.w, height: SCR.h, rx: SCR.r, fill: "#ddd7e4", stroke: "none" }, phoneG),
+        island: mk("rect", { x: X0 - PH.island.w / 2, y: top + PH.island.top, width: PH.island.w, height: PH.island.h, rx: PH.island.h / 2, stroke: "none" }, phoneG),
+        clock: mk("text", { x: X0 - 118, y: top + PH.island.top + PH.island.h / 2 + 12, "text-anchor": "middle", stroke: "none",
+          "font-family": "Inter, sans-serif", "font-size": 34, "font-weight": 600 }, phoneG),
+      };
+      phone.clock.textContent = "9:41";
+      // where the status bar lands: right of the island, centred on its line (phone coordinates, camera scale 1)
+      const SLOT = { x0: X0 + PH.island.w / 2 + 22, x1: X0 + PH.w / 2 - PH.stroke / 2 - 34, y: top + PH.island.top + PH.island.h / 2 };
+      const el = {
+        blob: mk("circle", { stroke: "none" }),
+        b1: mk("rect", { stroke: "none" }), b2: mk("rect", { stroke: "none" }), b3: mk("rect", { stroke: "none" }), b4: mk("rect", { stroke: "none" }),
+        top: mk("path", { fill: "none" }), mid: mk("path", { fill: "none" }), wedge: mk("path", { "stroke-width": 3 }),
+        batt: mk("rect", { stroke: "none" }), nub: mk("rect", { stroke: "none" }),
+        lineRect: mk("rect", { stroke: "none" }), lineArc: mk("path", { fill: "none" }),
+        black: mk("rect", { x: -10, y: -10, width: 1000, height: 570, stroke: "none" }),
+      };
+      const show = (e, on) => { e.style.display = on ? "" : "none"; };
+      const rrect = (e, s, rmax = Infinity) => {
+        show(e, !!s);
+        if (!s) return;
+        const r = Math.min(s.w / 2, s.h / 2, rmax);
+        e.setAttribute("x", s.cx - s.w / 2); e.setAttribute("y", s.cy - s.h / 2);
+        e.setAttribute("width", Math.max(0, s.w)); e.setAttribute("height", Math.max(0, s.h));
+        e.setAttribute("rx", r); e.setAttribute("ry", r);
+      };
+      // a Wi-Fi arc drawn from its bounding box: a stroke of the measured weight on a circle, ±46° about straight up
+      const HALF = (46 * Math.PI) / 180, ST = 15;
+      function wifiArc(e, s, rest) {
+        show(e, !!s);
+        if (!s) return;
+        // the weight grows with the arc once it is past its resting width (the push-in), never above 70% of its height
+        const st = Math.min(ST * Math.max(1, s.w / rest), s.h * 0.7), R = Math.max(1, (s.w - st) / (2 * Math.sin(HALF))), oy = s.cy - s.h / 2 + st / 2 + R;
+        const x0 = s.cx - R * Math.sin(HALF), x1 = s.cx + R * Math.sin(HALF), y = oy - R * Math.cos(HALF);
+        e.setAttribute("d", `M${x0} ${y}A${R} ${R} 0 0 1 ${x1} ${y}`);
+        e.setAttribute("stroke-width", st);
+      }
+      // the bottom of the glyph: a 90° sector standing on its point, its corners well rounded
+      // (a round-joined stroke of the same ink, the sector drawn inset by half of it)
+      function wedge(e, s) {
+        show(e, !!s);
+        if (!s) return;
+        const sw = s.h * 0.32, k = Math.SQRT1_2;
+        const ax = s.cx, ay = s.cy + s.h / 2 - sw / 2 * Math.SQRT2, r = s.h - sw * 1.2;
+        e.setAttribute("d", `M${ax} ${ay}L${ax - r * k} ${ay - r * k}A${r} ${r} 0 0 1 ${ax + r * k} ${ay - r * k}Z`);
+        e.setAttribute("stroke-width", sw);
+      }
+      function strokeArc(e, s) {
+        show(e, !!s);
+        if (!s) return;
+        let a0 = s.mid - s.half, a1 = s.mid + s.half;
+        if (a1 - a0 > 2 * Math.PI - 0.01) a1 = a0 + 2 * Math.PI - 0.01;
+        const p = (a) => `${s.ox + s.r * Math.cos(a)} ${s.oy + s.r * Math.sin(a)}`;
+        e.setAttribute("d", `M${p(a0)}A${s.r} ${s.r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${p(a1)}`);
+        e.setAttribute("stroke-width", s.t);
+      }
+
+      const quint = (x) => { x = clamp(x, 0, 1); return x < 0.5 ? 16 * x ** 5 : 1 - Math.pow(-2 * x + 2, 5) / 2; };
+      // the pull-back: leaves the lean gently, then glides in to rest
+      // (a quint in-out on time warped towards the start: still at both ends, the speed peaking early, a long glide in)
+      const quintOut = (x) => quint(1 - Math.pow(1 - clamp(x, 0, 1), 1.6));
+      const sineInOut = (x) => -(Math.cos(Math.PI * clamp(x, 0, 1)) - 1) / 2;
+      const backOut = (k) => (x) => { x = clamp(x, 0, 1) - 1; return 1 + x * x * ((k + 1) * x + k); };
+      const prog = (t, [a, b]) => clamp((t - a) / (b - a), 0, 1);
+      const mix = (A, B, u) => { const o = { kind: B.kind || A.kind }; for (const k in B) if (typeof B[k] === "number") o[k] = (A[k] ?? B[k]) + (B[k] - (A[k] ?? B[k])) * u; return o; };
+      // the status bar's extent at frame 55, for fitting it into the phone
+      const barBox = (() => {
+        const f = frame(BAR), xs = [];
+        for (const k of ["b1", "b4", "batt", "nub"]) if (f[k]) xs.push(f[k].cx - f[k].w / 2, f[k].cx + f[k].w / 2);
+        return { x0: Math.min(...xs), x1: Math.max(...xs), cy: f.mid.cy };
+      })();
+
+      function render(t) {
+        // the reference's frames until the glyph has formed, then our ending
+        const ft = Math.min(START + t * FPS, HOLD);
+        const at = (name) => sample(name, ft);
+        const bar = (name) => frame(BAR)[name];
+        const blob = at("blob");
+        show(el.blob, !!blob);
+        if (blob) { el.blob.setAttribute("cx", blob.cx); el.blob.setAttribute("cy", blob.cy); el.blob.setAttribute("r", Math.max(0, blob.d / 2)); }
+        show(el.black, false);
+        if (t < T_HOLD) {
+          for (const b of ["b1", "b2", "b3", "b4"]) rrect(el[b], at(b));
+          wifiArc(el.top, at("top"), 99); wifiArc(el.mid, at("mid"), 63); wedge(el.wedge, at("wedge"));
+          rrect(el.batt, at("batt"), 22); rrect(el.nub, at("nub"), 4);
+          const line = at("line");
+          rrect(el.lineRect, line && line.kind === "rect" ? line : null, 22);
+          strokeArc(el.lineArc, line && line.kind === "arc" ? line : null);
+        } else {
+          // the dots grow back into the signal bars one after another, a little elastic
+          ["b1", "b2", "b3", "b4"].forEach((b, k) => rrect(el[b], mix(at(b), bar(b), backOut(1.6)(prog(t, [T_HOLD + 0.06 * k, T_HOLD + 0.06 * k + 0.42])))));
+          // the glyph settles back to where it sat in the bar
+          const g = inOut3(prog(t, [T_HOLD, SPREAD[1]]));
+          wifiArc(el.top, mix(at("top"), bar("top"), g), 99); wifiArc(el.mid, mix(at("mid"), bar("mid"), g), 63); wedge(el.wedge, mix(at("wedge"), bar("wedge"), g));
+          // the ring unwinds into the upright stroke the battery was squeezed into, then that stroke widens back into the battery
+          const ring = at("line"), b = bar("batt");
+          const a1 = ring.mid + ring.half, tip = { cx: ring.ox + ring.r * Math.cos(a1), cy: ring.oy + ring.r * Math.sin(a1) };
+          const stroke = { cx: b.cx - b.w / 2 + 7.5, cy: b.cy, w: 15, h: b.h };
+          if (t < UNWIND[1]) {
+            // the far end runs round to the near one, leaving a round dot of stroke at the ring's lower right
+            const u = inOut3(prog(t, UNWIND));
+            strokeArc(el.lineArc, { ...ring, mid: ring.mid + ring.half * u, half: ring.half * (1 - u) });
+            show(el.batt, false);
+          } else if (t < RISE[1]) {
+            show(el.lineArc, false);
+            const u = backOut(1.2)(prog(t, RISE));
+            rrect(el.batt, mix({ ...tip, w: ring.t, h: ring.t }, stroke, u), 22);
+          } else {
+            show(el.lineArc, false);
+            const u = backOut(1.4)(prog(t, SPREAD)), x0 = b.cx - b.w / 2;
+            const w = 15 + (b.w - 15) * u;
+            rrect(el.batt, { cx: x0 + w / 2, cy: b.cy, w, h: b.h }, 22);
+          }
+          const nub = bar("nub"), nu = backOut(2)(prog(t, [SPREAD[1] - 0.08, SPREAD[1] + 0.12]));
+          rrect(el.nub, nu > 0.01 ? { ...nub, w: nub.w * nu, cx: nub.cx - nub.w / 2 + nub.w * nu / 2 } : null, 4);
+          show(el.lineRect, false); show(el.blob, false);
+        }
+        // one camera for the bar and the phone. The bar sits in the phone's status-bar slot at scale B (bar units to phone
+        // units); the camera maps phone units to the frame. At the start of the reveal it is so close that the slot fills
+        // the bar's own place on screen, so nothing jumps; it then pulls back to the phone's resting framing.
+        const B = (SLOT.x1 - SLOT.x0) / (barBox.x1 - barBox.x0);
+        const px = (barBox.x0 + barBox.x1) / 2, py = barBox.cy;
+        const Q = { x: (SLOT.x0 + SLOT.x1) / 2, y: SLOT.y };
+        const P1 = { x: X0 + (Q.x - X0) * C_END, y: Y0 + DY_END + (Q.y - Y0) * C_END };
+        // the lean-in takes the bar to LEAN_K of its size, which carries every part of the phone past the frame's edges;
+        // the pull-back starts from there, so the phone only ever enters from outside. Zoom is even on a log scale.
+        const LEAN_K = 1.45, k0 = (1 / B) * (1 + (LEAN_K - 1) * sineInOut(prog(t, LEAN)));
+        const ru = quintOut(prog(t, REVEAL));
+        const settle = 1 + 0.05 * sineInOut(prog(t, SETTLE));
+        const k = Math.exp(Math.log(k0) + (Math.log(C_END) - Math.log(k0)) * ru) * settle;
+        const Px = px + (P1.x - px) * ru, Py = py + (P1.y - py) * ru;
+        phoneG.setAttribute("transform", `translate(${Px} ${Py}) scale(${k}) translate(${-Q.x} ${-Q.y})`);
+        const ring = (e, grow) => {
+          e.setAttribute("x", SCR.x - grow); e.setAttribute("y", SCR.y - grow);
+          e.setAttribute("width", SCR.w + 2 * grow); e.setAttribute("height", SCR.h + 2 * grow); e.setAttribute("rx", SCR.r + grow);
+        };
+        ring(phone.frame, STYLE.bezel / k);
+        ring(phone.rim, (STYLE.bezel + STYLE.rim) / k);
+        cam.setAttribute("transform", `translate(${Px} ${Py}) scale(${k * B}) translate(${-px} ${-py})`);
+        cam.style.opacity = 1;
+        // the phone is switched on at the top of the lean, when all of it lies beyond the frame
+        const on = t >= REVEAL[0];
+        for (const key in phone) show(phone[key], on);
+        // the island is not carried in by the camera (it would cross the frame as a slab of black); it wakes up once the
+        // phone is nearly at rest, the way the real one does: a dot that swells, then stretches out into the pill
+        const iw = PH.island.w, ih = PH.island.h, ia = prog(t, [REVEAL[0] + 0.55, REVEAL[0] + 0.8]), ib = prog(t, [REVEAL[0] + 0.72, REVEAL[0] + 1.1]);
+        const dh = ih * sineInOut(ia), dw = dh + (iw - ih) * quint(ib);
+        show(phone.island, on && dh > 0.5);
+        phone.island.setAttribute("x", X0 - dw / 2); phone.island.setAttribute("width", dw);
+        phone.island.setAttribute("y", top + PH.island.top + (ih - dh) / 2); phone.island.setAttribute("height", dh);
+        phone.island.setAttribute("rx", dh / 2);
+        phone.clock.style.opacity = prog(t, [REVEAL[1] - 0.35, REVEAL[1] + 0.1]);
+      }
+
+      const tl = gsap.timeline({ paused: true });
+      const clock = { t: 0 };
+      tl.to(clock, { t: DURATION, duration: DURATION, ease: "none", onUpdate: () => render(clock.t) }, 0);
+      render(0);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["replica"] = tl;
+    })();
+  </script>
+</template>
