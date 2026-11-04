@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>二维码小树</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: radial-gradient(ellipse at 50% 38%, #fbf8f2 0%, #f3eee6 45%, #e9e1d5 100%);
+        overflow: hidden;
+        font: 15px/1.2 "PingFang SC", "Noto Sans SC", system-ui, sans-serif;
+        color: #3f3833;
+      }
+      #stage canvas {
+        display: block;
+        cursor: pointer;
+      }
+      #hint {
+        position: fixed;
+        left: 50%;
+        bottom: 168px;
+        transform: translateX(-50%);
+        padding: 9px 18px;
+        border-radius: 999px;
+        border: 1px solid #e2dbd0;
+        background: #faf7f2;
+        color: #7a6f66;
+        font-size: 14px;
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
+      }
+      #panel {
+        position: fixed;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%);
+        width: min(560px, calc(100vw - 32px));
+        display: grid;
+        gap: 10px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+      }
+      #url {
+        flex: 1;
+        min-width: 0;
+        height: 44px;
+        padding: 0 14px;
+        border-radius: 12px;
+        border: 1px solid #d9d0c3;
+        background: #fffdf9;
+        font: inherit;
+        color: inherit;
+        outline: none;
+      }
+      #url:focus {
+        border-color: #c27a3c;
+      }
+      #download {
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: 12px;
+        background: #c27a3c;
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+      }
+      #seasons button {
+        flex: 1;
+        height: 40px;
+        border: none;
+        border-radius: 12px;
+        background: #f8f4ee;
+        font: inherit;
+        color: #6b625b;
+        cursor: pointer;
+      }
+      #seasons button.on {
+        background: #ece2d5;
+        color: #3f3833;
+        font-weight: 600;
+      }
+      #swatches {
+        justify-content: center;
+        gap: 10px;
+      }
+      #swatches button {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid #f3eee6;
+        box-shadow: 0 0 0 1px #d9d0c3;
+        cursor: pointer;
+        padding: 0;
+      }
+      #swatches button.on {
+        box-shadow: 0 0 0 2px #3f3833;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="hint">点一下树，看二维码</div>
+    <div id="panel">
+      <div class="row">
+        <input id="url" spellcheck="false" placeholder="输入链接，回车生成" />
+        <button id="download" title="下载二维码图片">↓</button>
+      </div>
+      <div class="row" id="seasons">
+        <button data-season="spring">🌸 春</button>
+        <button data-season="summer">☀️ 夏</button>
+        <button data-season="autumn">🍂 秋</button>
+        <button data-season="winter">❄️ 冬</button>
+      </div>
+      <div class="row" id="swatches"></div>
+    </div>
+    <script src="vendor/qrcode.js"></script>
+    <script type="importmap">
+      { "imports": { "three": "./vendor/three.module.min.js" } }
+    </script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
