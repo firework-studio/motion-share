@@ -102,6 +102,18 @@
       #swatches button.on {
         box-shadow: 0 0 0 2px #3f3833;
       }
+      #credit {
+        position: fixed;
+        right: 18px;
+        bottom: 14px;
+        font-size: 12px;
+        color: #a89d92;
+        text-decoration: none;
+        letter-spacing: 0.3px;
+      }
+      #credit:hover {
+        color: #6b625b;
+      }
     </style>
   </head>
   <body>
@@ -120,6 +132,7 @@
       </div>
       <div class="row" id="swatches"></div>
     </div>
+    <a id="credit" href="https://github.com/firework-studio/motion-share/tree/main/qr-tree" target="_blank" rel="noopener">Made by Firework 工作室</a>
     <script src="vendor/qrcode.js"></script>
     <script type="importmap">
       { "imports": { "three": "./vendor/three.module.min.js" } }
