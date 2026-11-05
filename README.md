@@ -8,6 +8,8 @@ Firework 工作室分享的动效工程。每个文件夹都能单独运行：�
 | --- | --- |
 | [status-bar-to-phone](status-bar-to-phone) | 手机状态栏变形成「连接中」图标，再还原、镜头拉开揭示手机 |
 | [qr-tree](qr-tree) | 网页工具：二维码上长出一棵四季小树，点一下变成能扫的二维码 |
+| [glass-logo](glass-logo) | 网页工具：水珠胀开成带彩色折射的玻璃图标，可换成自己的 logo |
+| [refracted-text](refracted-text) | 网页工具：金属质感的字母依次升起，光带在表面流动，可改字 |
 
 ## 怎么用
 
