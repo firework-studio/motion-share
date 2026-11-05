@@ -294,7 +294,7 @@ void main(){
   float bLR = bump(a0, 318.0, 13.0), wLR = lw * (1.2 + 1.8 * bLR); // fattest in the middle of the corner
   float glowLR = exp(-pow((dq0 + wLR) / wLR, 2.0)) * 1.7 * bLR;
   // while it is a bead the ring is lit all the way round, as a drop is
-  // uneven, as the reference's drop: heavy and bright at the lower left and down the right to the lower right, thin
+  // uneven, like a real drop: heavy and bright at the lower left and down the right to the lower right, thin
   // and faint across the top
   float heavyR = bump(a0, 335.0, 40.0), heavyL = bump(a0, 222.0, 24.0), heavy = max(heavyR, heavyL * 0.85);
   // thick, as a drop's rim is: a good part of its radius, thickest where it is heaviest
@@ -346,7 +346,7 @@ void main(){
   // the lens keeps only its ring and a little of the rest
   refl3 = mix(refl3, vec3(1.0) * ringAll + refl3 * 0.35, uLens);
   // soft highlights: the frosted sheen of the lights over the curved glass, stronger where it turns away from us
-  // the glyph glows a little, a soft bloom of cool white round its strokes (what the reference's light layers add)
+  // the glyph glows a little, a soft bloom of cool white round its strokes
   // the glow is the glyph's own, so it is seen through the glass exactly as the glyph is
   vec3 bloom = vec3(0.82, 0.92, 1.0) * glow(qSeen) * 0.5 * uShow;
   vec3 glass = col * (1.0 - F) * vec3(0.86, 0.95, 1.0) + bloom;
