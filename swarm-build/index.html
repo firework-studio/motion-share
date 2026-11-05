@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Firework 工作室</title>
+    <link rel="stylesheet" href="swarm.css" />
+    <style>
+      @font-face { font-family: "Unbounded"; src: url("assets/fonts/Unbounded.woff2") format("woff2"); font-weight: 200 900; }
+      @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/JetBrainsMono.woff2") format("woff2"); font-weight: 100 800; }
+      :root { --mono: "JetBrains Mono", ui-monospace, Menlo, monospace; --wide: "Unbounded", "PingFang SC", sans-serif; --line: rgba(255, 255, 255, 0.09); --dim: #8e8aa6; }
+      /* the page ground: the same deep tone as the light, with a fine film grain */
+      html, body { margin: 0; background: #050508; color: #ecebf3; font-family: "PingFang SC", system-ui, sans-serif; }
+      body::after { content: ""; position: fixed; inset: 0; z-index: 990; pointer-events: none; opacity: 0.07; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+      .page { position: relative; overflow: hidden; }
+
+      /* hero: a halo of light with a dark core, thin HUD marks round the edges */
+      .hero { position: relative; height: 900px; }
+      /* the hero ground is a prism of light drawn in WebGL (prism.js), meeting at the avatar */
+      .hero .prism { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      nav { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 22px 36px; }
+      .brand { display: flex; align-items: center; gap: 10px; font: 500 15px/1 var(--wide); letter-spacing: 0.04em; }
+      .brand img { width: 22px; height: 22px; }
+      .links { display: flex; gap: 26px; font: 11px/1 var(--mono); letter-spacing: 0.14em; color: #b5b1cc; }
+      .burger { width: 22px; height: 12px; border-top: 1.5px solid #fff; border-bottom: 1.5px solid #fff; box-sizing: border-box; }
+      .status { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); display: flex; align-items: center; gap: 70px; padding: 5px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.1); }
+      .status .av { width: 34px; height: 34px; border-radius: 50%; display: block; }
+      .status .lb { font: 11px/1 var(--mono); letter-spacing: 0.16em; color: #d9d6ea; }
+      .status .ct { padding: 10px 16px; border-radius: 999px; background: #fff; color: #111; font: 600 11px/1 var(--mono); letter-spacing: 0.08em; }
+      .clock { position: absolute; left: 50%; top: 160px; transform: translateX(-50%); font: 15px/1 var(--mono); letter-spacing: 0.2em; color: #e8e6f4; }
+      .face { position: absolute; z-index: 999; /* stays above the wipe */ mix-blend-mode: screen; /* its dark ground drops away; the glass sits in the light */ left: 50%; top: 222px; width: 200px; height: 200px; margin-left: -100px; border-radius: 50%; -webkit-mask-image: radial-gradient(circle, #000 60%, transparent 71%); mask-image: radial-gradient(circle, #000 60%, transparent 71%); }
+      .hero h1 { position: absolute; left: 0; right: 0; top: 560px; margin: 0; text-align: center; font: 300 58px/1.12 var(--wide); letter-spacing: 0.01em; }
+      .hero h1 span { display: inline-block; vertical-align: top; }
+      .hero .sub { position: absolute; left: 50%; top: 712px; transform: translateX(-50%); width: 560px; margin: 0; text-align: center; font-size: 14px; line-height: 1.75; color: #c4c0dc; }
+      .hud { position: absolute; font: 10px/1.6 var(--mono); letter-spacing: 0.14em; color: var(--dim); }
+      .hud.l { left: 36px; top: 290px; } .hud.r { right: 36px; top: 290px; text-align: right; }
+      .hud b { display: block; color: #e6e3f5; font-weight: 600; }
+      .corner { position: absolute; width: 18px; height: 18px; border-color: rgba(255, 255, 255, 0.35); border-style: solid; border-width: 0; }
+      .corner.a { left: calc(50% - 150px); top: 196px; border-left-width: 1px; border-top-width: 1px; } .corner.b { left: calc(50% + 132px); top: 196px; border-right-width: 1px; border-top-width: 1px; }
+      .corner.c { left: calc(50% - 150px); top: 430px; border-left-width: 1px; border-bottom-width: 1px; } .corner.d { left: calc(50% + 132px); top: 430px; border-right-width: 1px; border-bottom-width: 1px; }
+      .tagline { position: absolute; left: 50%; top: 478px; transform: translateX(-50%); font: 10px/1 var(--mono); letter-spacing: 0.2em; color: var(--dim); }
+      .scroll { position: absolute; left: 140px; right: 140px; bottom: 48px; display: flex; align-items: center; gap: 18px; font: 11px/1 var(--mono); letter-spacing: 0.14em; color: #a9a5c2; }
+      .scroll i { flex: 1; height: 1px; background: rgba(255, 255, 255, 0.16); }
+      .scroll u { width: 14px; height: 22px; border: 1.5px solid #cfcbe6; border-radius: 8px; box-sizing: border-box; }
+
+      .label { font: 11px/1 var(--mono); letter-spacing: 0.18em; color: var(--dim); }
+
+      /* works: a ruled grid */
+      .works { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 36px; padding-top: 60px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+      .works .wl { position: absolute; left: 0; top: 26px; }
+      .cell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 16px; }
+      .works .wr { position: absolute; right: 0; top: 26px; }
+      .cell .hd { display: flex; justify-content: space-between; font: 10px/1 var(--mono); letter-spacing: 0.14em; color: var(--dim); }
+      .media { position: relative; margin-top: 14px; aspect-ratio: 16 / 10; }
+      .media video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+      .media .rec { position: absolute; left: 10px; top: 10px; display: flex; align-items: center; gap: 5px; font: 600 9px/1 var(--mono); letter-spacing: 0.14em; color: #fff; padding: 4px 6px; border-radius: 3px; background: rgba(0, 0, 0, 0.55); }
+      .media .rec i { width: 6px; height: 6px; border-radius: 50%; background: #ff4d5e; animation: rec 1.2s steps(2) infinite; }
+      @keyframes rec { 50% { opacity: 0.2; } }
+      .media .cn { position: absolute; width: 10px; height: 10px; border: 0 solid rgba(255, 255, 255, 0.7); }
+      .media .cn.a { left: -5px; top: -5px; border-left-width: 1px; border-top-width: 1px; } .media .cn.b { right: -5px; top: -5px; border-right-width: 1px; border-top-width: 1px; }
+      .media .cn.c { left: -5px; bottom: -5px; border-left-width: 1px; border-bottom-width: 1px; } .media .cn.d { right: -5px; bottom: -5px; border-right-width: 1px; border-bottom-width: 1px; }
+      .cell .t { margin-top: 16px; font-size: 17px; font-weight: 600; }
+      .cell .d { margin-top: 6px; font-size: 13px; color: #a9a5c2; }
+      .cell .tg { display: flex; gap: 8px; margin-top: 14px; }
+      .cell .tg span { font: 10px/1 var(--mono); letter-spacing: 0.08em; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; color: #c4c0dc; }
+
+      /* lab: generated studies */
+      .lab { position: relative; padding: 90px 36px 0; }
+      .lab .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 1060px; margin: 26px auto 0; }
+      .lab figure { position: relative; margin: 0; aspect-ratio: 16 / 10; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+      .lab video { display: block; width: 100%; height: 100%; object-fit: cover; }
+      .lab figure:has(> video.sw-hide) { border-color: transparent; } /* the cell's edge shows only once its film is there */
+      .lab figcaption { position: absolute; left: 12px; bottom: 12px; font: 10px/1 var(--mono); letter-spacing: 0.14em; color: #e6e3f5; padding: 6px 8px; background: rgba(5, 5, 7, 0.7); border-radius: 4px; }
+
+      /* process: a second halo */
+      .process { position: relative; height: 640px; margin-top: 70px; }
+      .process .prism, footer .prism { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      .process .chip { position: absolute; left: 36px; top: 70px; display: flex; align-items: center; gap: 8px; padding: 7px 14px 7px 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.6); font-size: 12px; }
+      .process .chip img { width: 16px; height: 16px; }
+      .process h2 { position: absolute; left: 36px; top: 120px; margin: 0; font: 300 52px/1.15 var(--wide); }
+      .process .lead { position: absolute; left: 36px; top: 200px; width: 520px; margin: 0; font-size: 14px; line-height: 1.75; color: #c4c0dc; }
+      .steps { position: absolute; left: 36px; right: 36px; top: 300px; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgba(255, 255, 255, 0.16); }
+      .step { padding: 20px 20px 0 0; }
+      .step .no { font: 11px/1 var(--mono); letter-spacing: 0.14em; color: #b8b2ec; }
+      .step .st { margin-top: 14px; font-size: 17px; font-weight: 600; }
+      .step .sd { margin-top: 8px; width: 220px; font-size: 13px; line-height: 1.6; color: #b2aecb; }
+      .process .cta { position: absolute; left: 36px; top: 450px; display: flex; gap: 12px; }
+      .process .cta span { padding: 11px 20px; border-radius: 999px; background: #fff; color: #111; font-size: 13px; font-weight: 600; }
+      .process .cta span + span { background: rgba(255, 255, 255, 0.1); color: #fff; }
+      .numbers { position: absolute; left: 36px; right: 36px; top: 520px; align-items: start; /* anchored at the top, so a cell being typed never moves the row */ display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(255, 255, 255, 0.16); }
+      .numbers div { padding-top: 18px; }
+      .numbers b { display: block; font: 300 40px/1 var(--wide); font-variant-numeric: tabular-nums; }
+      .numbers span { display: block; margin-top: 10px; font: 11px/1 var(--mono); letter-spacing: 0.12em; color: var(--dim); }
+
+      /* footer */
+      footer { position: relative; text-align: center; padding: 70px 20px 130px; overflow: hidden; }
+      footer .go { position: relative; display: inline-block; padding: 12px 26px; border-radius: 999px; background: #fff; color: #111; font-weight: 600; font-size: 14px; }
+      footer .fb { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 44px; font: 500 20px/1 var(--wide); letter-spacing: 0.04em; }
+      footer .fb img { width: 24px; height: 24px; }
+      footer p { position: relative; width: 560px; margin: 16px auto 0; font-size: 13px; line-height: 1.7; color: #9a96b6; }
+      footer .fl { position: relative; display: flex; gap: 24px; justify-content: center; margin-top: 20px; font: 11px/1 var(--mono); letter-spacing: 0.12em; color: #c4c0dc; }
+      footer .cp { position: relative; margin-top: 26px; font: 10px/1 var(--mono); letter-spacing: 0.1em; color: #6b6787; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <canvas class="prism" data-prism data-anchor=".hero .face"></canvas>
+        <nav>
+          <div class="brand"><img src="assets/mark.svg" alt="" data-b="image" /><span data-b="text">Firework</span></div>
+          <div class="links"><span data-b="text">WORK</span><span data-b="text">SERVICES</span><span data-b="text">PROCESS</span><span data-b="text">CONTACT</span></div>
+          <div class="burger" data-b="block"></div>
+        </nav>
+        <div class="status" data-b="block"><img class="av" src="assets/avatar.png" alt="" data-b="image" /><span class="lb" data-b="text">接受新项目 · AVAILABLE</span><span class="ct" data-b="block">联系 +</span></div>
+        <div class="clock" data-b="text" data-clock>00:00:00</div>
+        <div class="hud l" data-b="text">FW-STUDIO<br />MOTION LAB<b>v2026.11</b></div>
+        <div class="hud r" data-b="text">RENDER<br />60 FPS<b>100% CODE</b></div>
+        <i class="corner a" data-b="block"></i><i class="corner b" data-b="block"></i><i class="corner c" data-b="block"></i><i class="corner d" data-b="block"></i>
+        <img class="face" src="assets/avatar.png" alt="" />
+        <div class="tagline" data-b="text">FIREWORK STUDIO · MOTION IN CODE</div>
+        <h1><span data-b="text">MOTION, WRITTEN</span><br /><span data-b="text">IN CODE.</span></h1>
+        <p class="sub" data-b="text">让你的产品自己动起来。产品宣传片、品牌识别片、网页里会动的组件，每一帧都是代码，换个颜色，整片跟着变。</p>
+        <div class="scroll"><span data-b="text">向下滚动</span><i data-b="block"></i><u data-b="block"></u><i data-b="block"></i><span data-b="text">看作品</span></div>
+      </section>
+
+
+      <section class="works">
+        <div class="label wl" data-b="text">/ 作品 WORKS</div>
+        <div class="label wr" data-b="text">03 PROJECTS · 2026</div>
+        <div class="cell" data-b="block"><div class="hd"><span data-b="text">01 / AI-PLATFORM</span><span data-b="text">31 S</span></div><div class="media"><video data-b="image" src="assets/work-ai.mp4" poster="assets/work-ai.jpg" muted loop playsinline preload="auto"></video><span class="rec"><i></i>REC</span><i class="cn a"></i><i class="cn b"></i><i class="cn c"></i><i class="cn d"></i></div><div class="t" data-b="text">AI 平台宣传片</div><div class="d" data-b="text">一句话需求，变成一支有节奏的发布片</div><div class="tg"><span data-b="block">LAUNCH FILM</span><span data-b="block">HYPERFRAMES</span></div></div>
+        <div class="cell" data-b="block"><div class="hd"><span data-b="text">02 / CHAT-APP</span><span data-b="text">43 S</span></div><div class="media"><video data-b="image" src="assets/work-chat.mp4" poster="assets/work-chat.jpg" muted loop playsinline preload="auto"></video><span class="rec"><i></i>REC</span><i class="cn a"></i><i class="cn b"></i><i class="cn c"></i><i class="cn d"></i></div><div class="t" data-b="text">消息应用宣传片</div><div class="d" data-b="text">发光的图标、打字和气泡，一气呵成</div><div class="tg"><span data-b="block">PRODUCT</span><span data-b="block">UI MOTION</span></div></div>
+        <div class="cell" data-b="block"><div class="hd"><span data-b="text">03 / BRAND-ID</span><span data-b="text">69 S</span></div><div class="media"><video data-b="image" src="assets/work-brand.mp4" poster="assets/work-brand.jpg" muted loop playsinline preload="auto"></video><span class="rec"><i></i>REC</span><i class="cn a"></i><i class="cn b"></i><i class="cn c"></i><i class="cn d"></i></div><div class="t" data-b="text">品牌识别片</div><div class="d" data-b="text">标志、字体、色彩，一支片讲清一个品牌</div><div class="tg"><span data-b="block">BRAND</span><span data-b="block">TYPE</span></div></div>
+      </section>
+
+      <section class="lab" data-together>
+        <div class="label" data-b="text">/ 实验室 LAB · 交互与粒子实验</div>
+        <div class="row">
+          <figure><video data-b="image" src="assets/lab-crystal.mp4" poster="assets/lab-crystal.jpg" muted loop playsinline preload="auto"></video><figcaption data-b="text">CRYSTAL / 水晶球</figcaption></figure>
+          <figure><video data-b="image" src="assets/lab-hand.mp4" poster="assets/lab-hand.jpg" muted loop playsinline preload="auto"></video><figcaption data-b="text">HAND / 手势交互</figcaption></figure>
+          <figure><video data-b="image" src="assets/lab-particles.mp4" poster="assets/lab-particles.jpg" muted loop playsinline preload="auto"></video><figcaption data-b="text">PARTICLES / 粒子环</figcaption></figure>
+          <figure><video data-b="image" src="assets/lab-dots.mp4" poster="assets/lab-dots.jpg" muted loop playsinline preload="auto"></video><figcaption data-b="text">DOTS / 点阵光轨</figcaption></figure>
+        </div>
+      </section>
+
+      <section class="process">
+        <canvas class="prism" data-prism data-at="0.76,0.42"></canvas>
+        <span class="chip" data-b="block"><img src="assets/mark.svg" alt="" data-b="image" /><span data-b="text">过程 PROCESS</span></span>
+        <h2 data-b="text">从一句话到一支片</h2>
+        <p class="lead" data-b="text">每一个动作都是写出来的，所以每一帧都能改。下面是我们做一支动效的四步。</p>
+        <div class="steps" data-b="block">
+          <div class="step"><span class="no" data-b="text">01 — BRIEF</span><div class="st" data-b="text">一句话需求</div><div class="sd" data-b="text">你说想要什么感觉，我们拆成镜头和动效。</div></div>
+          <div class="step"><span class="no" data-b="text">02 — BUILD</span><div class="st" data-b="text">逐帧搭起来</div><div class="sd" data-b="text">用代码写每一个动作，在浏览器里实时预览。</div></div>
+          <div class="step"><span class="no" data-b="text">03 — BRAND</span><div class="st" data-b="text">换成你的品牌</div><div class="sd" data-b="text">颜色、字体、文案都是参数，改一处全片跟着变。</div></div>
+          <div class="step"><span class="no" data-b="text">04 — SHIP</span><div class="st" data-b="text">交付与开源</div><div class="sd" data-b="text">成片、源码一起给你，以后自己也能改。</div></div>
+        </div>
+        <div class="cta"><span data-b="block">开始一个项目</span><span data-b="block">看服务</span></div>
+        <div class="numbers"><div><b data-b="text" data-count="40" data-suffix="+">40+</b><span data-b="text">支动效作品 / WORKS</span></div><div><b data-b="text" data-count="100" data-suffix="%">100%</b><span data-b="text">代码驱动 / CODE</span></div><div><b data-b="text" data-count="1">1</b><span data-b="text">句话换品牌 / PROMPT</span></div></div>
+      </section>
+
+
+      <footer>
+        <canvas class="prism" data-prism data-anchor="footer .fb img" data-when="end"></canvas>
+        <span class="go" data-b="block">聊聊你的项目</span>
+        <div class="fb"><img src="assets/mark.svg" alt="" data-b="image" /><span data-b="text">FIREWORK</span></div>
+        <p data-b="text">我们用代码做动效：产品宣传片、品牌识别片、网页里会动的组件。</p>
+        <div class="fl"><span data-b="text">小红书</span><span data-b="text">X</span><span data-b="text">GITHUB</span><span data-b="text">EMAIL</span></div>
+        <div class="cp" data-b="text">© 2026 FIREWORK STUDIO · CODE MIT · WORKS CC BY 4.0</div>
+      </footer>
+    </div>
+    <script>
+      // the clock in the hero ticks, unless the swarm is typing it
+      const clockEl = document.querySelector("[data-clock]");
+      const tick = () => { if (!clockEl.querySelector(".sw-caret")) clockEl.textContent = new Date().toTimeString().slice(0, 8); };
+      tick(); setInterval(tick, 1000);
+    </script>
+    <script src="prism.js"></script>
+    <script src="swarm.js"></script>
+  </body>
+</html>
