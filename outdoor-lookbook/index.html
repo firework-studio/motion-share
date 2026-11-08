@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lookbook · Firework Studio</title>
+<link rel="stylesheet" href="lookbook.css" />
+</head>
+<body>
+  <header class="top">
+    <a class="brand"><img src="assets/logo.svg" alt="" /><span id="brand"></span></a>
+    <nav id="nav"><a></a><a></a><a></a><a class="on"></a></nav>
+    <button class="lang" id="lang" aria-label="Switch language"></button>
+    <button class="bag" id="bag" aria-label="Bag">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 8h14l-1 12H6L5 8Z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></svg>
+      <span id="bagCount">0</span>
+    </button>
+  </header>
+
+  <main class="shop">
+    <section class="stage" id="stage">
+      <div class="intro" id="intro">
+        <h1 id="title"></h1>
+        <p id="sub"></p>
+      </div>
+      <div class="focusHead" id="focusHead">
+        <span class="kicker" id="focusKicker"></span>
+        <span class="ftitle" id="focusTitle"></span>
+        <button class="close" id="close" aria-label="Back to all looks">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+      <div class="ring" id="ring"></div>
+      <div class="hint" id="hint"></div>
+      <div class="rack" id="rack"><span class="rl" id="rackLabel"></span><div class="hangers" id="hangers"></div><span class="rh" id="rackHint"></span></div>
+      <div class="controls">
+        <button class="arrow" id="prev" aria-label="Previous look">
+          <svg viewBox="0 0 32 16" width="30" height="15" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M31 8H2m6-6L2 8l6 6" /></svg>
+        </button>
+        <div class="steps" id="steps"></div>
+        <button class="play" id="play" aria-label="Play or pause"></button>
+        <button class="arrow" id="next" aria-label="Next look">
+          <svg viewBox="0 0 32 16" width="30" height="15" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8h29m-6-6 6 6-6 6" /></svg>
+        </button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2 id="inLook"></h2>
+      <ol class="items" id="items"></ol>
+      <div class="bundle">
+        <div class="brow">
+          <div><b id="bundleTitle"></b><small id="bundleNote"></small></div>
+          <div class="prices"><s id="was"></s><span id="now"></span></div>
+        </div>
+        <button class="addAll" id="addAll"><span id="addAllText"></span>
+          <svg viewBox="0 0 32 16" width="26" height="13" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 8h29m-6-6 6 6-6 6" /></svg>
+        </button>
+      </div>
+    </aside>
+  </main>
+  <div class="toast" id="toast"></div>
+  <div class="cursor" id="cursor"><span></span></div>
+
+  <script src="data.js"></script>
+  <script src="lookbook.js"></script>
+</body>
+</html>

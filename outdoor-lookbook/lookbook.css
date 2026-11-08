@@ -1,0 +1,175 @@
+/* Lookbook: a ring of looks on the left, the pieces of the front look on the right. White, black, hairlines;
+   the only colour on the page is the clothes. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --ink: #111; --mute: #8a8a8a; --line: #e6e6e6; --ease: cubic-bezier(0.22, 0.7, 0.2, 1); }
+html, body { height: 100%; }
+body { background: #fff; color: var(--ink); font: 15px/1.4 "Inter", -apple-system, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+.top { height: 88px; padding: 0 40px; display: flex; align-items: center; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
+.brand img { width: 30px; height: 30px; }
+.top nav { margin-left: auto; display: flex; gap: 30px; font-weight: 600; font-size: 14.5px; }
+.top nav a { cursor: pointer; } .top nav a.on { border-bottom: 1.5px solid var(--ink); padding-bottom: 3px; }
+.lang { margin-left: 34px; min-width: 34px; height: 26px; padding: 0 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; transition: border-color 0.2s; }
+.lang:hover { border-color: var(--ink); }
+.bag { margin-left: 18px; display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.bag.bump span { animation: bump 0.5s var(--ease); }
+@keyframes bump { 40% { transform: scale(1.7); } }
+
+.shop { display: grid; grid-template-columns: 1fr 380px; height: calc(100% - 88px); }
+
+/* the stage */
+.stage { position: relative; overflow: hidden; }
+.intro { position: absolute; left: 56px; top: 44px; z-index: 30; transition: opacity 0.5s, transform 0.6s var(--ease); }
+.intro h1 { font-size: 46px; font-weight: 500; letter-spacing: -0.02em; }
+.intro p { margin-top: 12px; font-size: 13px; color: var(--mute); }
+.focusHead { position: absolute; left: 56px; right: 40px; top: 30px; z-index: 30; display: flex; flex-direction: column; opacity: 0; transform: translateY(-8px);
+  transition: opacity 0.5s, transform 0.6s var(--ease); pointer-events: none; }
+.focusHead .kicker { font-size: 11px; letter-spacing: 0.14em; color: var(--mute); }
+.focusHead .ftitle { font-size: 17px; margin-top: 4px; }
+.focusHead .close { position: absolute; right: 0; top: 4px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; transition: background 0.2s; }
+.focusHead .close:hover { background: #f2f2f2; }
+.stage.focus .intro { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+.stage.focus .focusHead { opacity: 1; transform: none; pointer-events: auto; }
+
+.ring { position: absolute; inset: 0; }
+.look { position: absolute; left: 50%; bottom: 16%; height: min(70%, calc(84% - 150px)); aspect-ratio: 2 / 3; transform-origin: 50% 100%; cursor: pointer;
+  transition: transform 0.9s var(--ease), filter 0.9s var(--ease), opacity 0.9s var(--ease); will-change: transform, filter, opacity; }
+.look img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; user-select: none; transform-origin: 50% 100%; }
+.look::before { content: ""; position: absolute; left: 12%; right: 12%; bottom: 3%; height: 7%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0)); z-index: -1; }
+.look.front { cursor: zoom-in; }
+/* the sheen: on every turn a thin slanted line of light starts at each look's top-left corner and wipes down to its feet, only over the figure
+   (masked by the photo's own cut-out) */
+.look .shine { position: absolute; inset: 0; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+  -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0) 48.6%, rgba(255, 255, 255, 0.45) 50%, rgba(255, 255, 255, 0) 51.4%) 0 0 / 100% 320% no-repeat; }
+.look.sheen .shine { animation: sheen 1s cubic-bezier(0.45, 0.05, 0.3, 1) var(--d, 0s) both; }
+@keyframes sheen { 0% { opacity: 1; background-position: 0 0; } 85% { opacity: 1; } 100% { opacity: 0; background-position: 0 100%; } }
+.stage.focus .look.front { cursor: default; }
+
+/* pins on the front look in focus */
+.pin { position: absolute; z-index: 5; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: var(--ink); background: rgba(255, 255, 255, 0.92); box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  opacity: 0; transform: scale(0.4); transition: opacity 0.35s, transform 0.45s var(--ease); pointer-events: none; }
+.pin::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.9); animation: ping 2.4s infinite; }
+@keyframes ping { 0% { transform: scale(0.7); opacity: 1; } 80%, 100% { transform: scale(1.5); opacity: 0; } }
+.stage.focus .look.front .pin { opacity: 1; transform: none; pointer-events: auto; cursor: pointer; }
+.pin.on { background: var(--ink); color: #fff; }
+.pin .tip { position: absolute; left: 34px; top: 50%; transform: translateY(-50%) translateX(-4px); white-space: nowrap; font-size: 12px; font-weight: 500;
+  color: var(--ink); background: #fff; padding: 6px 10px; border-radius: 4px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12); opacity: 0; transition: 0.25s; pointer-events: none; }
+.pin .tip b { font-weight: 700; margin-left: 8px; }
+.pin:hover .tip, .pin.on .tip { opacity: 1; transform: translateY(-50%); }
+
+.hint { position: absolute; left: 0; right: 0; bottom: 4.5%; text-align: center; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--mute); opacity: 0; transition: opacity 0.5s; }
+.stage.focus .hint { opacity: 0; }
+
+/* try-on: in a look, a rack on the left holds this look's outer layer and the ones it can swap to. Drag one onto the
+   figure (or tap it): it flies to her chest, the old layer comes off and the new one goes on from the shoulders down */
+.rack { position: absolute; left: 48px; top: 50%; z-index: 30; width: 150px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  opacity: 0; transform: translate(-10px, -50%); pointer-events: none; transition: opacity 0.4s, transform 0.5s var(--ease); }
+.stage.focus .rack { opacity: 1; transform: translate(0, -50%); pointer-events: auto; transition-delay: 0.45s; }
+.rack .rl { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); }
+.rack .rh { font-size: 11px; color: var(--mute); }
+.hangers { display: flex; flex-direction: column; gap: 6px; }
+.hanger { position: relative; width: 132px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border-radius: 10px;
+  cursor: grab; touch-action: none; user-select: none; transition: background 0.25s, transform 0.3s var(--ease), opacity 0.25s; }
+.hanger img { width: 104px; height: 104px; object-fit: contain; pointer-events: none; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.14)); transition: transform 0.3s var(--ease); }
+.hanger:hover { background: #f5f5f5; } .hanger:hover img { transform: translateY(-3px) rotate(-2deg); }
+.hanger span { font-size: 11.5px; text-align: center; line-height: 1.3; }
+.hanger em { font-style: normal; font-size: 10px; letter-spacing: 0.08em; color: #fff; background: var(--ink); padding: 2px 7px; border-radius: 999px; margin-top: 3px; }
+.hanger.worn { cursor: default; } .hanger.worn:hover { background: none; } .hanger.worn:hover img { transform: none; }
+.hanger.lifted { opacity: 0.25; }
+.ghost { position: fixed; left: 0; top: 0; width: 150px; height: 150px; margin: -75px 0 0 -75px; z-index: 97; pointer-events: none;
+  background: center / contain no-repeat; filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.22)); transition: scale 0.2s var(--ease); }
+.ghost.over { scale: 1.1; }
+.look.drop > img { filter: drop-shadow(0 0 16px rgba(0, 0, 0, 0.3)); }
+.look .next { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+
+.controls { position: absolute; left: 40px; right: 40px; bottom: 32px; display: flex; align-items: center; gap: 22px; z-index: 30;
+  transition: opacity 0.5s; }
+.stage.focus .controls { opacity: 0; pointer-events: none; }
+.arrow { padding: 8px; color: #555; transition: color 0.2s, transform 0.3s var(--ease); }
+.arrow:hover { color: var(--ink); } #prev:hover { transform: translateX(-3px); } #next:hover { transform: translateX(3px); }
+.steps { display: flex; gap: 8px; flex: 1; }
+.step { width: 46px; text-align: left; font-size: 11px; letter-spacing: 0.06em; color: #aaa; transition: width 0.6s var(--ease), color 0.3s; cursor: pointer; }
+.step i { display: block; height: 1.5px; background: var(--line); margin-bottom: 9px; position: relative; overflow: hidden; }
+.step i::after { content: ""; position: absolute; inset: 0; background: #777; transform: scaleX(0); transform-origin: 0 50%; }
+.step.on { width: 190px; color: #444; }
+.step.on i::after { transform: scaleX(1); }
+.step.on.timing i::after { animation: fill var(--dur) linear forwards; transform: scaleX(0); }
+@keyframes fill { to { transform: scaleX(1); } }
+.step .nm { opacity: 0; transition: opacity 0.3s; } .step.on .nm { opacity: 1; }
+.play { width: 28px; height: 28px; display: grid; place-items: center; }
+.play::before { content: ""; border-left: 8px solid #555; border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+.play.on::before { border: 0; width: 8px; height: 10px; border-left: 2.5px solid #555; border-right: 2.5px solid #555; }
+
+/* the panel */
+.panel { border-left: 1px solid var(--line); padding: 44px 32px 32px; display: flex; flex-direction: column; min-height: 0; }
+.panel h2 { font-size: 19px; font-weight: 500; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.items { list-style: none; flex: 1; overflow: auto; }
+.item { display: grid; grid-template-columns: 84px 1fr 26px; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line);
+  opacity: 0; filter: blur(14px); transition: opacity 0.45s ease-out, filter 0.5s ease-out, background 0.3s; }
+.item.in { opacity: 1; filter: none; }
+.item.hl { background: linear-gradient(90deg, rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0)); }
+.item .ph { position: relative; width: 84px; height: 84px; background: #f6f6f6; border-radius: 2px; }
+.item .ph img { width: 100%; height: 100%; object-fit: contain; }
+.item .ph em { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18); font: 700 10px/20px "Inter", sans-serif; text-align: center; font-style: normal; }
+.item .meta small { display: block; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); margin-top: 6px; }
+.item .meta b { display: block; font-weight: 500; margin-top: 4px; }
+.item .meta span { display: block; font-size: 13px; margin-top: 4px; }
+.item .add { align-self: center; width: 26px; height: 26px; font-size: 20px; font-weight: 300; line-height: 1; transition: transform 0.3s var(--ease); }
+.item.open .add { transform: rotate(45deg); }
+.sizes { grid-column: 2 / 4; display: flex; flex-wrap: wrap; gap: 6px; max-height: 0; overflow: hidden; transition: max-height 0.45s var(--ease), margin 0.45s; }
+.item.open .sizes { max-height: 80px; margin-top: -4px; }
+.sizes button { min-width: 38px; padding: 6px 9px; font-size: 12px; border: 1px solid var(--line); border-radius: 2px; transition: 0.2s; }
+.sizes button:hover { border-color: var(--ink); }
+.sizes button.picked { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.bundle { padding-top: 22px; border-top: 1px solid var(--line); transition: opacity 0.35s; }
+.bundle.hide { opacity: 0; transition: none; }
+.brow { display: flex; justify-content: space-between; align-items: flex-end; }
+.brow b { font-weight: 500; font-size: 13.5px; display: block; }
+.brow small { font-size: 11.5px; color: var(--mute); }
+.prices s { font-size: 11.5px; color: var(--mute); margin-right: 10px; }
+.prices span { font-size: 17px; }
+.addAll { margin-top: 18px; width: 100%; height: 56px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; gap: 14px;
+  font-size: 14px; transition: background 0.45s; }
+.addAll:hover { background: #333; }
+.addAll.loading { background: #d6d6d6; pointer-events: none; }
+.addAll.done { background: #2f6b3f; }
+
+.toast { position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 12px 20px; font-size: 13px;
+  border-radius: 3px; opacity: 0; transition: 0.4s var(--ease); pointer-events: none; z-index: 99; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* the cursor follower: a dot that trails the pointer over the stage; it swells while moving fast, and becomes a
+   labelled ring over a look (VIEW on the front one, DRAG beside it) */
+.cursor { position: fixed; left: 0; top: 0; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--ink);
+  pointer-events: none; z-index: 98; display: grid; place-items: center; opacity: 0;
+  transition: width 0.35s var(--ease), height 0.35s var(--ease), margin 0.35s var(--ease), background 0.35s, opacity 0.25s; }
+.cursor span { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; color: #555; opacity: 0; transition: opacity 0.2s; }
+.cursor.on { opacity: 1; }
+.cursor.fast { width: 22px; height: 22px; margin: -11px 0 0 -11px; background: #3a3a3a; }
+.cursor.ring { width: 64px; height: 64px; margin: -32px 0 0 -32px; background: rgba(228, 228, 228, 0.82); backdrop-filter: blur(2px); }
+.cursor.ring span { opacity: 1; }
+@media (hover: none) { .cursor { display: none; } }
+
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  .top { padding: 0 20px; } .top nav { display: none; }
+  .shop { grid-template-columns: 1fr; height: auto; }
+  .stage { height: 78vh; }
+  .intro, .focusHead { left: 20px; } .intro h1 { font-size: 34px; }
+  .controls { left: 12px; right: 12px; gap: 6px; bottom: 20px; } .arrow { padding: 6px 4px; }
+  .steps { gap: 5px; min-width: 0; } .step { width: 14px; font-size: 0; } .step.on { width: 86px; font-size: 11px; }
+  .intro p { font-size: 12px; }
+  .rack { left: 0; right: 0; top: auto; bottom: 10px; width: auto; flex-direction: row; justify-content: center; transform: translateY(10px); }
+  .stage.focus .rack { transform: none; } .rack .rl, .rack .rh { display: none; }
+  .hangers { flex-direction: row; } .hanger { width: 76px; padding: 4px; } .hanger img { width: 56px; height: 56px; } .hanger span { display: none; }
+  .panel { border-left: 0; border-top: 1px solid var(--line); padding: 28px 20px; }
+  .toast { bottom: auto; top: 76px; transform: translate(-50%, -12px); } .toast.on { transform: translate(-50%, 0); }
+}
