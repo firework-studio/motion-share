@@ -54,6 +54,7 @@ npx serve .
 | `lookbook.js` | 轮播、标记点、单品与购物车、试穿、鼠标跟随、语言切换 |
 | `lookbook.css` | 样式与手机适配 |
 | `assets/` | 标志、模特图、商品图 |
+| `prompts.md` | 模特图、单品图、试穿图的出图提示词（ChatGPT） |
 
 ## 素材与许可
 
