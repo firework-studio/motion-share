@@ -49,8 +49,8 @@ window.HOST_PLAN = {{
 html = (PACK / "kit/example.html").read_text().replace("DURATION", f"{seconds:g}")
 html = "\n".join(f"      <!-- 做好主持人姿势图后去掉这一行的注释 {l.strip()} -->" if 'id="host"' in l else l for l in html.splitlines()) + "\n"
 (app / "index.html").write_text(html)
-shutil.copy(PACK / "templates/gen_voice.py", project / "voice/gen.py")
-shutil.copy(PACK / "templates/words.py", project / "words.py")
+if not (project / "voice/gen.py").exists(): shutil.copy(PACK / "templates/gen_voice.py", project / "voice/gen.py")  # never overwrite work already there
+if not (project / "words.py").exists(): shutil.copy(PACK / "templates/words.py", project / "words.py")  # never overwrite work already there
 for f in ("旁白稿模板.md", "逐帧拆解需求.md", "设计需求.md"):
-    shutil.copy(PACK / "templates" / f, project / "docs" / f)
+    if not (project / "docs" / f).exists(): shutil.copy(PACK / "templates" / f, project / "docs" / f)
 print(f"created {app}\nnext: write the voiceover in docs/旁白稿模板.md, then voice/gen.py; see SKILL.md")
