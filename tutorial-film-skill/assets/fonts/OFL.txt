@@ -1,0 +1,8 @@
+Fonts in this folder
+
+- Noto Sans SC: Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+- Noto Serif SC (GB2312 subset): Copyright 2017-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+- JetBrains Mono: Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono).
+
+All are licensed under the SIL Open Font License, Version 1.1, full text: https://openfontlicense.org/open-font-license-official-text/
+You may use, bundle and redistribute them, including commercially; they may not be sold on their own.

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1440" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/kit/live-kit.css" />
+    <script src="assets/kit/live-kit.js"></script>
+    <style>
+      /* A new live-demonstration film, started from the kit's example. Replace the beats below with
+         the film's own: one visible operation per spoken line, timed from the voiceover's alignment. */
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="DURATION" data-fps="30" data-width="1080" data-height="1440">
+      <!-- the voiceover, from 0.4 s (agent-workdir/voice/gen.py); remove this line until there is one -->
+      <!-- <audio id="voice" class="clip" src="assets/audio/voice.mp3" data-start="0.4" data-duration="VOICE_LENGTH" data-track-index="9"></audio> -->
+
+      <div id="scene">
+        <div class="subtitle">
+          <div class="pg" id="s1"><span class="w">第一步，</span><span class="w">先找一段</span><em class="w">参考视频。</em></div>
+          <div class="pg" id="s2"><span class="w">别跟它描述</span><em class="w">“高级感”。</em></div>
+          <div class="pg" id="s3"><span class="w">把视频交给它，</span><em class="w">逐帧量。</em></div>
+          <div class="pg" id="s4"><span class="w">最后，</span><span class="w">代码放进</span><em class="w">一个文件夹。</em></div>
+        </div>
+
+        <div class="file-object" id="file"><img class="shadow" id="fileShadow" src="assets/kit/file-shadow.svg" alt="" /><img class="file-face" src="assets/kit/video-file.svg" alt="" /><div class="filename mono">参考.mp4</div></div>
+
+        <div class="input-only" id="inp"><img class="shadow" id="inpShadow" src="assets/kit/input-shadow.svg" alt="" /><div class="typed" id="typed"></div><div class="send">↑</div>
+          <svg class="strike" viewBox="0 0 260 52"><path id="strike" d="M3 31C65 21 135 29 253 10" fill="none" stroke="#5b3df0" stroke-width="6" stroke-linecap="round" /></svg>
+        </div>
+
+        <div class="dialog" id="dlg"><img class="shadow" id="dlgShadow" src="assets/kit/dialog-shadow.svg" alt="" /><i class="grip"></i><span class="close">×</span>
+          <div class="drop-zone" id="drop"></div>
+          <div class="attachment" id="chip"><img src="assets/kit/video-file.svg" alt="" /><span class="mono">参考.mp4</span></div>
+          <div class="input-well"><span class="plus">+</span><div class="send">↑</div></div>
+        </div>
+
+        <div class="fold-back" id="foldBack"><div class="tab"></div><div class="back"></div></div>
+        <div class="asset-file" id="code"><img src="assets/kit/code-file.svg" alt="" /><div class="filename">代码.zip</div></div>
+        <div class="fold-front" id="foldFront"><div class="front"></div></div>
+
+        <div class="stamp" id="stamp1" style="left: 560px; top: 300px"><span class="word">逐帧量</span><div class="smear"></div></div>
+        <div class="step" id="step"><img class="shadow" src="assets/kit/step-shadow.svg" alt="" /><div class="block">1</div></div>
+      </div>
+
+      <div id="host" class="clip" data-composition-id="host" data-composition-src="compositions/host.html" data-start="0" data-duration="DURATION" data-width="1080" data-height="1440" data-track-index="10" style="z-index: 60"></div>
+      <div class="click" id="ring"></div>
+      <img class="cursor" id="cur" src="assets/kit/cursor.svg" alt="" />
+      <div id="sig"><img id="sigMark" src="assets/kit/mark.svg" alt="" /><div id="sigName">你的名字</div></div>
+    </div>
+
+    <script>
+      const K = LiveKit, { $, F, P, Eout, lerp, box, place, show, fitShadow, land } = K;
+      const END = DURATION;
+
+      // beats (film seconds). In a real film these come from the voiceover's word times.
+      const PAGES = [["s1", [0.4, 1.0, 1.6], 3.0], ["s2", [3.0, 3.8], 5.2], ["s3", [5.2, 6.4], 8.4], ["s4", [8.4, 8.9, 9.4], 11.4]];
+      const STEPS = [0.4, 8.4];
+
+      // the cursor's path: points [t, x, y] and one Bézier drag
+      const path = (T) => K.route(T, [
+        [1.2, 760, 760], [1.8, 470, 520],            // to the file
+        [2.6, 470, 520], [3.2, 700, 640],            // to the input
+        [3.9, 700, 640], [4.0, 410, 655],            // to the start of the strike
+        [4.3, 650, 625],                             // along it
+        [5.2, 230, 520],                             // back to the file
+        ["bez", 5.6, 6.2, [230, 520], [360, 320], [560, 420], [700, 560]],  // drag into the chat
+        [8.6, 700, 560], [9.0, 330, 740],            // to the code file
+        [9.6, 330, 740], [10.4, 640, 760], [10.8, 900, 820],
+      ]);
+
+      function render(T) {
+        K.subtitles(T, PAGES);
+        K.stepBadge($("#step"), T, STEPS, 11.4);
+
+        // the file: lands, then is dragged into the chat and absorbed as an attachment
+        const L = land(T, 1.2), c = path(T), drag = Eout(P(T, 5.6, 5.8)), absorb = Eout(P(T, 6.4, 6.8));
+        const w = lerp(230, 142, drag), h = lerp(280, 174, drag);
+        const fx = T < 5.2 ? lerp(380, 120, Eout(P(T, 2.4, 3.0))) : c[0] - 0.5 * w, fy = T < 5.2 ? 400 + L.y : c[1] - 0.368 * h;
+        show($("#file"), T < 1.2 ? 0 : L.a * (1 - P(T, 6.6, 6.8)));
+        place($("#file"), lerp(fx, 395, absorb), lerp(fy, 495, absorb), lerp(w, 43, absorb), lerp(h, 53, absorb), -5, L.s);
+        fitShadow($("#fileShadow"), w, h);
+        $("#file").classList.toggle("selected", T >= 1.8);
+        $("#file").style.zIndex = T >= 5.2 ? 65 : 30;
+        $("#file .filename").style.opacity = 1 - P(T, 5.2, 5.4);
+
+        // the input: appears, types the vague wish, strikes it out, clears
+        show($("#inp"), T >= 2.6 && T < 5.2 ? 1 : 0);
+        $("#typed").textContent = T < 4.8 ? K.typed(T, [[3.3, 3.8, "要高级感"]]) : "";
+        K.drawStroke($("#strike"), T, 4.0, 4.3); $("#strike").style.opacity = T < 4.8 ? 1 : 0;
+
+        // the chat: opens to receive, the file becomes an attachment
+        show($("#dlg"), T < 5.2 ? 0 : 1 - P(T, 8.2, 8.4));
+        $("#drop").style.opacity = T >= 5.2 && T < 6.5 ? 1 : 0;
+        $("#chip").style.opacity = Eout(P(T, 6.6, 6.8));
+        K.stamp($("#stamp1"), T, 6.4, 8.2);
+
+        // a file into the folder
+        const fb = land(T, 8.9), cf = land(T, 9.05), f = K.intoFolder(T, 9.6, 10.0, 10.25, [250, 640], [520, 400], [520, 488]);
+        show($("#foldBack"), T < 8.9 ? 0 : fb.a); show($("#foldFront"), T < 8.9 ? 0 : fb.a);
+        place($("#foldBack"), 495, 550 + fb.y, 370, 270, 0, fb.s); place($("#foldFront"), 495, 610 + fb.y, 370, 210, 0, fb.s);
+        show($("#code"), T < 9.05 ? 0 : cf.a);
+        place($("#code"), f.x, f.y + cf.y, 160, 198, 0, cf.s);
+        $("#code").style.zIndex = f.inside ? 35 : 45;
+        $("#code .filename").style.opacity = 1 - f.u;
+
+        K.cursor($("#cur"), $("#ring"), T, path, { clicks: [1.8, 3.2, 9.6], held: [[5.2, 6.4]], from: 1.2, until: 11.4 });
+        K.signature(T, 11.4);
+      }
+      K.mount(render, END);
+    </script>
+  </body>
+</html>

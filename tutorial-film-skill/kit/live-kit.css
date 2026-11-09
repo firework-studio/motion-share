@@ -1,0 +1,218 @@
+/* Live-demonstration kit: the objects of a "live demo" tutorial film (cursor, step badge, stamp, chat, input, files,
+   frame strip, data table, code editor, photos, prompt card, folder, signature). Drawn by Codex for
+   gathered here; see ../SKILL.md. */
+@font-face{font-family:"Noto Sans SC";font-weight:100 900;src:url("../fonts/NotoSansSC.ttf")}
+@font-face{font-family:"Noto Serif SC";font-weight:200 900;src:url("../fonts/NotoSerifSC-gb2312.ttf")}
+@font-face{font-family:"JetBrains Mono";font-weight:400 600;src:url("../fonts/JetBrainsMono.woff2")}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1440px;overflow:hidden;background:#f4f2ee}
+#root{position:relative;width:1080px;height:1440px;overflow:hidden;isolation:isolate;color:#211e1b;font-family:"Noto Sans SC",sans-serif;background:#f4f2ee radial-gradient(#504a4214 .65px,transparent .85px) 0 0/6px 6px}
+#scene{position:absolute;inset:0}
+.scene{position:relative;width:1080px;height:1440px;isolation:isolate;background:#F4F2EE radial-gradient(#504a4214 .65px,transparent .85px) 0 0/6px 6px}
+.mono{font-family:"JetBrains Mono","Noto Sans SC",monospace}
+.subtitle{position:absolute;left:96px;top:137px;width:888px;height:68px;font-size:40px;font-weight:550;line-height:64px;letter-spacing:-1px;white-space:nowrap;z-index:70}
+.subtitle em{font-family:"Noto Serif SC";font-style:normal;font-size:46px;font-weight:650;color:#5b3df0;letter-spacing:-1.6px}
+.host{position:absolute;left:0;top:880px;height:560px;isolation:isolate;z-index:60}
+.host>img{position:absolute;left:0;top:0;height:560px;width:auto;max-width:none;display:block}
+.host .shade{z-index:-1}
+.shadow{position:absolute;left:-20px;top:-20px;pointer-events:none;z-index:-1;max-width:none}
+.step{position:absolute;left:610px;top:350px;width:172px;height:180px;isolation:isolate;transform:rotate(-4deg);z-index:45}
+.step .block{position:absolute;inset:0;background:#19171b;border:2px solid #161318;border-radius:20px;box-shadow:6px 8px 0 #4a414d,6px 9px 0 1px #19151d,inset 0 1px 0 #ffffff24;display:flex;align-items:center;justify-content:center;color:#fffcf7;font-size:145px;line-height:180px;font-weight:850;font-family:"Noto Sans SC";letter-spacing:-8px}
+.step.small{left:918px;top:210px;width:76px;height:80px;transform:rotate(-3deg)}
+.step.small .block{font-size:62px;line-height:80px;border-radius:12px;box-shadow:3px 4px 0 #4a414d,3px 5px 0 1px #19151d}
+.step.small .shadow{width:116px;height:120px;left:-20px;top:-20px}
+.file-object{position:absolute;width:230px;height:280px;isolation:isolate;transform:rotate(-5deg);z-index:30}
+.file-object .file-face{display:block;width:100%;height:100%}
+.file-object .filename{position:absolute;top:282px;left:-15px;right:-15px;text-align:center;font-size:25px;line-height:38px;white-space:nowrap;color:#302b31}
+.file-object.selected .filename{background:#e4dbfc;color:#5b3df0;border-radius:4px;box-shadow:0 1px 0 #b3a3d2}
+.file-object.ghost{width:142px;height:174px;transform:rotate(5deg);z-index:65}
+.file-object.ghost .filename{font-size:19px;top:173px}
+.file-object.ghost .shadow{width:182px;height:214px}
+.cursor{position:absolute;width:38px;height:48px;z-index:80;transform-origin:4px 3px}
+.click{position:absolute;width:48px;height:48px;border:2px solid #5b3df0;border-radius:50%;z-index:75;opacity:.8}
+.input-only{position:absolute;left:366px;top:520px;width:620px;height:150px;background:#fdfcf9;border:1.5px solid #39322e;border-radius:14px;box-shadow:4px 6px 0 #c7becd;transform:rotate(-1deg);isolation:isolate;z-index:25}
+.input-only:before,.dialog:before{content:"";position:absolute;inset:0;border-radius:inherit;background:#fdfcf9;z-index:0;pointer-events:none}
+.input-only .typed{position:absolute;left:28px;top:35px;font-size:51px;line-height:74px;font-weight:500;letter-spacing:-2px}
+.input-only .typed:after{content:"";display:inline-block;vertical-align:-8px;width:2px;height:53px;background:#5b3df0;margin-left:6px}
+.send{position:absolute;right:18px;bottom:19px;width:48px;height:48px;border-radius:10px;border:1.5px solid #7b6d89;color:#5b3df0;background:#f4effb;font-family:"JetBrains Mono";font-size:34px;line-height:44px;text-align:center}
+.strike{position:absolute;left:20px;top:51px;width:260px;height:52px;z-index:35;overflow:visible}
+.reject-cross{position:absolute;left:278px;top:31px;width:62px;height:62px;transform:rotate(7deg)}
+.dialog{position:absolute;left:356px;top:420px;width:640px;height:332px;background:#fdfcf9;border:1.5px solid #39322e;border-radius:16px;box-shadow:4px 6px 0 #c7becd;isolation:isolate;z-index:25;transform:rotate(-.6deg)}
+.dialog .grip{position:absolute;left:24px;top:20px;width:44px;height:4px;background:#c5b9ce;border-radius:3px}
+.dialog .close{position:absolute;right:20px;top:9px;color:#978994;font-size:25px;line-height:38px;font-weight:300}
+.dialog .input-well{position:absolute;left:26px;right:26px;bottom:20px;height:88px;border:1px solid #c5bbc9;border-radius:10px;background:#f7f4f8}
+.dialog .input-well .plus{position:absolute;left:18px;top:20px;font-size:34px;color:#817286;line-height:44px;font-weight:300}
+.dialog .send{right:12px;bottom:19px}
+.drop-zone{position:absolute;left:26px;right:26px;top:58px;height:142px;border:2px dashed #5b3df0;border-radius:12px;background:#f0e9ff80}
+.drop-zone:after{content:"+";position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);font-size:44px;font-weight:300;color:#9d87d3}
+.attachment{position:absolute;left:27px;top:64px;width:240px;height:76px;border:1px solid #c8bdcf;border-radius:8px;background:#f1ebf8;display:flex;align-items:center;padding:8px 12px;gap:13px;font-size:23px;white-space:nowrap;color:#4e4057}
+.attachment img{width:43px;height:53px;display:block}
+.dialog.compact{left:124px;top:370px;width:440px;height:260px;transform:rotate(-1deg)}
+.dialog.compact .input-well{left:20px;right:20px;bottom:17px;height:60px}
+.dialog.compact .send{width:36px;height:36px;line-height:32px;font-size:26px;bottom:11px;right:10px;border-radius:7px}
+.dialog.compact .input-well .plus{font-size:27px;top:7px;left:13px}
+.dialog.compact .attachment{left:22px;top:55px;width:228px;height:66px;font-size:21px}
+.dialog.compact .attachment img{width:36px;height:45px}
+.dialog.output{left:124px;top:332px;height:236px}
+.frame-strip{position:absolute;left:276px;top:676px;width:710px;height:100px;display:grid;grid-template-columns:repeat(6,1fr);gap:10px;isolation:isolate;z-index:30;transform:rotate(1deg)}
+.frame-strip .slot{position:relative;border:1.5px solid #8d7e88;border-radius:4px;background:#fcfaf7;box-shadow:2px 3px 0 #cbbfd1;overflow:hidden}
+.slot:before,.slot:after{content:"";position:absolute;left:0;right:0;height:10px;background:repeating-linear-gradient(90deg,#eee7f2 0 5px,#6b5b6d 5px 9px,#eee7f2 9px 15px);opacity:.65}
+.slot:before{top:0}
+.slot:after{bottom:0}
+.slot .abstract{position:absolute;left:26px;right:26px;top:28px;height:43px;border:1.5px solid #d6cadd;transform:skewY(-6deg)}
+.slot.scanned{border-color:#5b3df0;background:#e7defa}
+.slot.active{border:2px solid #5b3df0}
+.scanline{position:absolute;left:422.4px;top:-15px;height:130px;width:3px;background:#5b3df0;box-shadow:0 0 0 4px #5b3df013;z-index:5}
+.scanline:before,.scanline:after{content:"";position:absolute;left:-6px;width:15px;height:3px;background:#5b3df0}
+.scanline:before{top:0}
+.scanline:after{bottom:0}
+.stamp{position:absolute;font-family:"Noto Sans SC";font-weight:900;font-size:128px;line-height:1;letter-spacing:-6px;white-space:nowrap;color:#5b3df0;transform-origin:0 50%;transform:rotate(-3deg) scaleX(.76) scaleY(.94);z-index:42;}
+.stamp.black{color:#211c1d}
+.stamp .word{display:block}
+.stamp .smear{height:7px;width:94%;margin-left:3%;margin-top:4px;border-radius:35% 50% 15% 45%;background:currentColor;transform:rotate(-1deg);opacity:.86}
+.depth-grid{position:absolute;left:450px;top:590px;width:544px;height:246px;z-index:35;font-size:26px}
+.depth-grid table{width:100%;border-collapse:collapse;background:transparent;table-layout:fixed}
+.depth-grid th{height:42px;font-weight:500;font-size:25px;text-align:right;color:#70645c;padding:0 0 6px}
+.depth-grid td{height:68px;font-family:"JetBrains Mono";font-size:32px;font-weight:500;text-align:right;border-top:1.5px solid #c0b4bf;padding:8px 0;color:#322a31}
+.depth-grid th:first-child,.depth-grid td:first-child{font-family:"Noto Sans SC";text-align:left;width:90px;font-size:24px;color:#70645c}
+.depth-grid td:nth-child(2){color:#5b3df0}
+.depth-grid.compact-grid{left:500px;top:300px;width:510px;height:198px}
+.depth-grid.compact-grid th{height:36px;font-size:22px}
+.depth-grid.compact-grid td{height:54px;font-size:27px;padding:5px 0}
+.depth-grid.compact-grid th:first-child,.depth-grid.compact-grid td:first-child{font-size:21px;width:85px}
+.depth-grid .active-col{color:#5b3df0!important}
+.model{position:absolute;overflow:hidden;transform-origin:50% 100%;opacity:1;z-index:20}
+.model img{position:absolute;display:block;max-width:none}
+.cue-line{position:absolute;height:2px;background:#5b3df0;transform-origin:left center;z-index:30}
+.board-caption{position:absolute;font-size:24px;line-height:37px;color:#6e615e;width:370px}
+.board-caption b{display:block;font-size:29px;font-weight:650;color:#211e1b;margin-bottom:8px}
+.board-title{position:absolute;left:76px;top:64px;font-size:37px;font-weight:650}
+.board-small{font-size:21px;line-height:33px}
+.board-line{position:absolute;left:76px;right:76px;height:1px;background:#d3c9bf}
+
+/* Rest of film: independent object arrangements, never a permanent outer stage. Coordinates are film pixels. */
+.stamp{-webkit-mask-image:none;mask-image:none;padding:14px 30px 18px 14px;margin:-14px 0 0 -14px;overflow:visible;letter-spacing:-5px}
+
+/* Physical object shadows: fixed 6px dots behind opaque faces, no blurred drop shadow. */
+.solid{position:absolute;isolation:isolate;z-index:25}
+.solid:before{content:"";position:absolute;inset:12px -14px -18px 12px;background:radial-gradient(#55405c70 1px,transparent 1.2px) 0 0/6px 6px;border-radius:inherit;z-index:-1;pointer-events:none}
+.face{position:relative;width:100%;height:100%;background:#fdfcf9;border:1.5px solid #39322e;border-radius:inherit;overflow:hidden}
+
+.page-object{border-radius:3px}
+.page-object img{display:block;width:100%;height:100%;object-fit:contain;background:white}
+.film-page{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
+.film-page+img{position:absolute;inset:0;pointer-events:none}
+
+.template-page{position:absolute;width:520px;height:340px;background:#fffdf9;border:1px solid #b8b0aa;isolation:isolate}
+.template-page:before{content:"";position:absolute;inset:10px -10px -10px 10px;background:radial-gradient(#55405c60 1px,transparent 1.2px) 0 0/6px 6px;z-index:-1}
+.template-page .face{padding:16px;border:0;border-radius:0}
+.shop-nav{display:flex;justify-content:space-between;font:12px "JetBrains Mono";border-bottom:1px solid #ccc;padding-bottom:10px}
+.shop-title{font-size:31px;font-family:"Noto Serif SC";margin:20px 0 10px}
+.products{display:flex;gap:12px}
+.products figure{margin:0;flex:1;font-size:10px}
+.products img{display:block;width:100%;height:160px;object-fit:cover;object-position:50% 35%;background:#f2f0ec}
+.products figcaption{margin-top:7px}
+
+.number-row{position:absolute;display:flex;gap:30px;height:144px;z-index:30}
+.number-tile{width:144px;height:144px;background:#19171b;border:2px solid #161318;border-radius:17px;box-shadow:5px 7px 0 #4a414d;position:relative;display:grid;place-items:center;color:#fffaf3;font-size:110px;font-weight:850;line-height:1}
+.number-tile .tick{position:absolute;right:-9px;top:-13px;color:#5b3df0;background:#f4f2ee;border-radius:50%;width:54px;height:54px;display:grid;place-items:center;font-size:48px;font-weight:850;line-height:54px}
+.number-tile.checked{box-shadow:5px 7px 0 #5b3df0}
+
+.photo{position:absolute;width:174px;height:261px;isolation:isolate;z-index:25}
+.photo:before{content:"";position:absolute;inset:9px -10px -11px 10px;z-index:-1;background:radial-gradient(#55405c70 1px,transparent 1.2px) 0 0/6px 6px}
+.photo img{width:100%;height:100%;display:block;object-fit:cover;border:5px solid #fffdf9;outline:1px solid #d0c7be}
+.photo.selected img{outline:3px solid #5b3df0}
+
+.prompt-input{border-radius:15px}
+.prompt-input .face{padding:28px 30px 75px}
+.prompt-input pre{font:24px/1.7 "JetBrains Mono","Noto Sans SC";white-space:pre-wrap;letter-spacing:-.8px;margin:0}
+.prompt-input .prompt-span{position:relative;display:inline-block}
+.prompt-input .circled:after{content:"";position:absolute;inset:-2px -6px;border:2.5px solid #5b3df0;border-radius:48% 45% 47% 46%;transform:rotate(-1.2deg);pointer-events:none}
+.prompt-input .typed-caret{display:inline-block;width:2px;height:25px;background:#5b3df0;vertical-align:middle;margin-left:4px}
+.prompt-input .send{right:20px;bottom:18px}
+.prompt-input .plus{position:absolute;left:28px;bottom:20px;font-size:32px;color:#8e7d91}
+.baseline{position:absolute;height:2px;background:#5b3df0;z-index:20}
+.model-free{position:absolute;overflow:hidden;transform-origin:50% 100%;z-index:25}
+.model-free img{position:absolute;max-width:none}
+.foot-tick{position:absolute;width:10px;height:10px;border:2px solid #5b3df0;border-radius:50%;background:#f4f2ee;z-index:30}
+
+.code-editor{border-radius:12px}
+.editor-title{height:46px;border-bottom:1px solid #cec2d1;display:flex;align-items:center;padding:0 20px;font:22px "JetBrains Mono";color:#5b3df0;gap:10px}
+.editor-title:before{content:"";width:10px;height:10px;border-radius:50%;background:#5b3df0}
+.editor-body{padding:17px 18px;font:21px/1.6 "JetBrains Mono","Noto Sans SC";overflow:visible;color:#3b3440}
+.editor-body .row{display:block;white-space:pre-wrap;overflow-wrap:anywhere}
+.editor-body mark{background:#e9e0fe;color:#5b3df0;box-shadow:0 0 0 2px #e9e0fe}
+.editor-body .key{color:#7e6b87}
+.editor-body .muted{color:#9c9298}
+.editor-body .caret{display:inline-block;width:2px;height:21px;vertical-align:-4px;background:#5b3df0}
+
+.page-crop{border-radius:3px}
+.page-crop .face{background:#fff}
+.page-crop img{position:absolute;max-width:none}
+.photo-price{position:absolute;border:2px solid #5b3df0;pointer-events:none;border-radius:3px}
+.price-loupe{position:absolute;overflow:hidden;border-bottom:2px solid #5b3df0;height:45px;width:150px;background:#fff;z-index:30}
+.price-loupe img{position:absolute;max-width:none;width:1600px;height:900px}
+
+.chat{border-radius:16px}
+.chat .face{padding:26px}
+.bubble{position:relative;font-size:33px;line-height:1.45;background:#eee7fc;color:#36283e;border:1px solid #c6b5e0;border-radius:12px 12px 3px 12px;padding:16px 20px;margin-left:25px;max-width:100%}
+.bubble+.bubble{margin-top:24px}
+.chat-input{position:absolute;left:24px;right:24px;bottom:20px;border:1px solid #c5bbc9;border-radius:10px;background:#f7f4f8;height:86px;padding:20px;font-size:27px;color:#4c3a55}
+.chat-input .send{right:12px;bottom:18px}
+.chat-drop{position:absolute;left:24px;right:24px;top:64px;height:155px;border:2px dashed #5b3df0;border-radius:10px;background:#eee6fc60;display:grid;place-items:center;color:#9d87d3;font-size:44px}
+.gif-file{position:absolute;width:180px;z-index:45;isolation:isolate}
+.gif-file .gif-face{height:180px;border:1.5px solid #3c303d;border-radius:7px;position:relative;overflow:hidden;background:#fff;box-shadow:4px 5px 0 #c3b5cd}
+.gif-file img{position:absolute;left:-135px;top:-5px;width:450px;height:253px;max-width:none}
+.gif-file .play{position:absolute;left:66px;top:66px;width:48px;height:48px;border-radius:50%;background:#5b3df0e0;color:#fff;text-align:center;font-size:25px;line-height:48px}
+.gif-file .filename{text-align:center;font:21px "JetBrains Mono","Noto Sans SC";margin-top:10px;white-space:nowrap}
+.gif-file:before{content:"";position:absolute;inset:12px -13px 22px 12px;background:radial-gradient(#55405c70 1px,transparent 1.2px) 0 0/6px 6px;z-index:-1}
+.gif-strip{position:absolute;display:flex;gap:8px;z-index:30}
+.gif-strip .mini{position:relative;width:126px;height:142px;overflow:hidden;border:1px solid #9a899f;background:white}
+.gif-strip img{position:absolute;width:360px;max-width:none;left:-117px;top:-8px}
+.gif-strip .mini.active{outline:3px solid #5b3df0;outline-offset:2px}
+
+.folder{position:absolute;width:370px;height:270px;isolation:isolate;z-index:35}
+.folder:before{content:"";position:absolute;inset:20px -17px -17px 17px;z-index:-2;background:radial-gradient(#55405c90 1px,transparent 1.2px) 0 0/6px 6px;border-radius:16px}
+.folder .back{position:absolute;inset:30px 0 0;background:#b6a4e6;border:2px solid #473258;border-radius:12px;box-shadow:6px 7px 0 #6c558b}
+.folder .tab{position:absolute;left:0;top:0;width:150px;height:65px;background:#b6a4e6;border:2px solid #473258;border-bottom:0;border-radius:12px 16px 0 0}
+.folder .front{position:absolute;inset:60px 0 0;background:#5b3df0;border:2px solid #382165;border-radius:12px;transform:skewX(-5deg);transform-origin:bottom;z-index:4;box-shadow:inset 0 2px 0 #ffffff55}
+.folder .front:after{content:"";position:absolute;left:26px;right:26px;top:24px;height:2px;background:#ffffff30}
+.asset-file{position:absolute;width:160px;height:198px;z-index:40;isolation:isolate}
+.asset-file img{width:100%;height:100%;display:block}
+.asset-file .filename{position:absolute;top:198px;left:-20px;right:-20px;text-align:center;font:22px/32px "JetBrains Mono","Noto Sans SC";white-space:nowrap}
+.asset-file:before{content:"";position:absolute;inset:10px -12px -10px 12px;background:radial-gradient(#55405c70 1px,transparent 1.2px) 0 0/6px 6px;z-index:-1}
+.folder .asset-file{z-index:2}
+.chat-preview{position:absolute;left:24px;top:34px;width:120px;height:130px;overflow:hidden;border:1px solid #aa97b4;border-radius:6px}
+.chat-preview img{position:absolute;width:330px;max-width:none;left:-104px;top:-4px}
+.send.active{background:#5b3df0;color:#fff;border-color:#5b3df0}
+
+
+/* ---- kit additions ---- */
+/* everything that animates starts hidden; the film's render() shows it */
+.cursor,.click,.step,.stamp,.k-hidden{opacity:0}
+/* stamps keep their glyphs whole: no ink-hole mask, room around the letters */
+.stamp{-webkit-mask-image:none;mask-image:none;padding:14px 30px 18px 14px;margin:-14px 0 0 -14px;overflow:visible}
+/* subtitle: one line, pages of words */
+.subtitle .pg{position:absolute;left:0;top:0;white-space:nowrap}
+.subtitle .w{display:inline-block;opacity:0}
+/* the dot shadow images stretch to their object */
+.shadow{width:auto;height:auto}
+/* a motion-reference card: frames cycle inside, a GIF tag in the corner */
+.gif-card{position:absolute;width:200px;z-index:40;isolation:isolate;transform-origin:0 0}
+.gif-card::before{content:"";position:absolute;inset:12px -13px 22px 12px;background:radial-gradient(#55405c70 1px,transparent 1.2px) 0 0/6px 6px;z-index:-1}
+.gif-card .gif-face{position:relative;width:200px;height:280px;overflow:hidden;background:#fff;border:1.5px solid #39322e;border-radius:10px;box-shadow:4px 6px 0 #c7becd}
+.gif-card .gif-face img{position:absolute;max-width:none;opacity:0}
+.gif-tag{position:absolute;left:10px;top:10px;font:600 15px/22px "JetBrains Mono";color:#fff;background:#5b3df0;border-radius:5px;padding:0 7px}
+.gif-card .gif-name{margin-top:10px;text-align:center;font:20px/30px "JetBrains Mono","Noto Sans SC";color:#4e4057;white-space:nowrap}
+/* a folder in two parts, so files can drop between its back and its front */
+.fold-back,.fold-front{position:absolute}
+.fold-back{z-index:33;width:370px;height:270px}
+.fold-back::before{content:"";position:absolute;inset:20px -17px -17px 17px;z-index:-2;background:radial-gradient(#55405c90 1px,transparent 1.2px) 0 0/6px 6px;border-radius:16px}
+.fold-back .tab{position:absolute;left:0;top:0;width:150px;height:65px;background:#b6a4e6;border:2px solid #473258;border-bottom:0;border-radius:12px 16px 0 0}
+.fold-back .back{position:absolute;inset:30px 0 0;background:#b6a4e6;border:2px solid #473258;border-radius:12px;box-shadow:6px 7px 0 #6c558b}
+.fold-front{z-index:37;width:370px;height:210px}
+.fold-front .front{position:absolute;inset:0;background:#5b3df0;border:2px solid #382165;border-radius:12px;transform:skewX(-5deg);transform-origin:bottom;box-shadow:inset 0 2px 0 #ffffff55}
+/* studio signature: mark and name fade in together, small and still */
+#sig{position:absolute;inset:0;z-index:85;opacity:0}
+#sigMark{position:absolute;left:480px;top:630px;width:120px;height:120px;opacity:0}
+#sigName{position:absolute;left:0;right:0;top:778px;text-align:center;font-size:50px;font-weight:500;letter-spacing:1px;color:#3a3733;white-space:nowrap;opacity:0}
