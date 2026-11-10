@@ -1,6 +1,6 @@
 # 现场演示教程片 · Skill
 
-把一条你喜欢的短视频，变成一条讲你自己内容的教程片：逐帧拆原片、写旁白、配音、做会说话的主持人，再一段段做出画面。这是 Firework 工作室做教程短视频用的整套系统。
+把一条你喜欢的短视频，变成一条讲你自己内容的教程片：逐帧拆原片、写旁白、配音，再一段段做出画面。这是 Firework 工作室做教程短视频用的整套系统。
 
 ## 怎么用
 
@@ -31,8 +31,7 @@
 | `templates/` | 旁白稿、逐帧拆解、设计需求三份模板，配音脚本，逐字时间脚本 |
 | `assets/svg/` | 物件的点阵投影和图标 |
 | `assets/fonts/` | Noto Sans SC、Noto Serif SC、JetBrains Mono（OFL，可商用） |
-| `host/` | 主持人：合成文件、口型与眨眼图层、点阵影子、按脸对齐的脚本，以及做你自己角色的说明 |
 
 ## 许可
 
-代码使用 MIT 协议（仓库根目录 `LICENSE`）。字体沿用 SIL Open Font License 1.1，见 `assets/fonts/OFL.txt`。主持人角色请用你自己的形象，本包不含 Firework 工作室的角色图。
+代码使用 MIT 协议（仓库根目录 `LICENSE`）。字体沿用 SIL Open Font License 1.1，见 `assets/fonts/OFL.txt`。
