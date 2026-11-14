@@ -14,6 +14,7 @@ Firework 工作室分享的动效工程。每个文件夹都能单独运行：�
 | [outdoor-lookbook](outdoor-lookbook) | 网页模板：服装品牌 Lookbook 购物页，3D 轮播、标记点、拖到身上试穿、中英文切换，改 `data.js` 即可换成自己的品牌 |
 | [tutorial-film-skill](tutorial-film-skill) | Skill：把一条喜欢的短视频变成讲你自己内容的教程片，逐帧拆原片、写旁白、配音、会说话的主持人、一段段做出画面（Claude Code / Cursor / Trae 都能用） |
 | [corner-cafe](corner-cafe) | 城市小店 01 · 咖啡窗：线稿街角，天黑店员按下开关、灯一盏盏亮起，路人经过路灯拖出影子；手机和电脑壁纸（静态图和首尾无缝的循环视频）加网页源码，可改店名 |
+| [christmas-ball](christmas-ball) | 圣诞彩球红团子：液滴长成小红书图标，收藏星钻进团子，变成八颗圣诞彩球，彩带炸开后挂上 REDnote 的松枝；带运动路线和剪辑软件时间轴两种幕后画面 |
 
 ## 怎么用
 
